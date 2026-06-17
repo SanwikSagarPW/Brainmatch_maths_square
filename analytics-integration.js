@@ -13,12 +13,15 @@
 // Generate unique session ID
 const sessionID = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+// Resolve gameId: use injected GameID from React Native WebView if present, else default
+const _gameId = (window.userInfo && window.userInfo.GameID) ? window.userInfo.GameID : 'BrainMatch_MathsSquare';
+
 // Initialize Analytics Manager (from analytics-bridge.js)
 // Using singleton pattern with getInstance() for the new analytics system
 const analytics = AnalyticsManager.getInstance();
-analytics.initialize('BrainMatch', sessionID);
+analytics.initialize(_gameId, sessionID);
 
-console.log('[Analytics] Initialized with Session ID:', sessionID);
+console.log('[Analytics] Initialized with Session ID:', sessionID, 'GameID:', _gameId);
 
 // ============================================================================
 // ANALYTICS HELPER FUNCTIONS

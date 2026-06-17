@@ -127,8 +127,8 @@ async function initializeGameManager() {
       maxLevel: CONFIG.levels.maxLevel,
     });
     
-    // Get AnalyticsBridge if available (assuming it's global)
-    const analyticsBridge = typeof AnalyticsBridge !== 'undefined' ? AnalyticsBridge : null;
+    // Get AnalyticsManager if available (global set by analytics-bridge.js)
+    const analyticsBridge = typeof AnalyticsManager !== 'undefined' ? AnalyticsManager.getInstance() : null;
     
     // Create GameManager
     gameManager = new GameManager({
@@ -139,10 +139,16 @@ async function initializeGameManager() {
       config: CONFIG,
     });
     
-    // Initialize GameManager
-    // You can optionally provide a backend payload here if you have one
-    // Example: const backendPayload = { userId: '123', gameId: 'BrainMatch', highestLevelPlayed: 2 };
-    const result = await gameManager.initialize();
+    // READ window.userInfo injected by React Native WebView and remap keys
+    const userInfo = window.userInfo;
+    const backendPayload = (userInfo && userInfo.UserID && userInfo.GameID)
+      ? {
+          userId: userInfo.UserID,
+          gameId: userInfo.GameID,
+          highestLevelPlayed: typeof userInfo.highestLevelPlayed === 'number' ? userInfo.highestLevelPlayed : 1,
+        }
+      : null;
+    const result = await gameManager.initialize(backendPayload);
     
     highestLevelPlayed = result.startLevel;
     
